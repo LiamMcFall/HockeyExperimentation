@@ -24,3 +24,12 @@ events$players_on <- as.character(events$players_on)
 events$players_off <- as.character(events$players_off)
 events$game_date <- date(events$game_date)
 
+# Shot attempts
+
+unblocked_shot_types <- c('GOAL', 'MISS', 'SHOT')
+
+unblocked_shots <- events %>%
+  filter(event_type %in% unblocked_shot_types)
+
+write.csv(unblocked_shots, "/Users/liammcfall/HockeyExperimentation/unblocked_shots.csv")
+
