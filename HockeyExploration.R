@@ -37,8 +37,22 @@ unblocked_shots <- unblocked_shots %>%
   mutate(shot_distance = sqrt((89 - abs(coords_x))^2 + coords_y^2),
          shot_angle = abs(atan(coords_y / (89 - abs(coords_x))) * (180 / pi)),
          is_goal = ifelse(event_type == 'GOAL', 1, 0))
+        # is_rebound = )
 
 # Unblocked exploratory
 
-test_model <- glm(is_goal ~ shot_distance + shot_angle, data = unblocked_shots)
+test <- unblocked_shots %>%
+  drop_na(is_goal) %>%
+  drop_na(shot_distance) %>%
+  drop_na(shot_angle)
+
+test_model <- glm(is_goal ~ shot_distance + shot_angle, data = test)
 summary(test_model)
+test_model.probs <- predict(test_model, type = "response" )
+
+test_wProbs <- test %>%
+  mutate(prob = test_model.probs)
+
+testQuery <- test_wProbs %>%
+  group_by(event_team, season) %>%
+  summarise(xG = sum(prob))
