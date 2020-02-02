@@ -3,7 +3,7 @@ library(tidyverse)
 library(lubridate)
 library(magrittr)
 
-events <- read_sas("/Users/liammcfall/HockeyExperimentation/nhl_combined.sas7bdat")
+events <- read.csv("/Users/liammcfall/HockeyExperimentation/nhl_events.csv")
 
 # Event cleaning
 
