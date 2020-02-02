@@ -2,11 +2,20 @@ library(tidyverse)
 library(lubridate)
 library(magrittr)
 
+'''
+filenames <- list.files(full.names=TRUE)
+All <- lapply(filenames,function(i){
+  read.csv(i)
+})
+events <- do.call(rbind.data.frame, All)
+write.csv("/Users/liammcfall/HockeyExperimentation/nhl_events.csv")
+'''
+
 events <- read.csv("/Users/liammcfall/HockeyExperimentation/nhl_events.csv")
 
 # Event cleaning
 
-events <- subset(events, select = - c(X, VAR1))
+events <- subset(events, select = -X)
 events$season <- factor(events$season)
 events$game_id <- factor(events$game_id)
 events$event_description <- as.character(events$event_description)
