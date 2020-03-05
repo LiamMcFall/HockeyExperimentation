@@ -32,6 +32,7 @@ unblocked_shots <- events %>%
   filter(event_type %in% unblocked_shot_types)
 
 #write.csv(unblocked_shots, "/Users/liammcfall/HockeyExperimentation/unblocked_shots.csv")
+unblocked_shots <- read.csv("/Users/liammcfall/HockeyExperimentation/unblocked_shots.csv")
 
 unblocked_shots <- unblocked_shots %>%
   mutate(shot_distance = sqrt((89 - abs(coords_x))^2 + coords_y^2),
@@ -56,3 +57,34 @@ test_wProbs <- test %>%
 testQuery <- test_wProbs %>%
   group_by(event_team, season) %>%
   summarise(xG = sum(prob))
+
+xG_cleaned <- test_wProbs %>% select(c(-num_on, -num_off, -players_on, -players_off))
+xG_cleaned$defending_team <- NA
+xG_cleaned$defending_team <- ifelse(xG_cleaned$event_team == xG_cleaned$home_team, xG_cleaned$away_team, xG_cleaned$home_team)
+xG_cleaned$defending_team <- factor(xG_cleaned$defending_team, levels = c(1:31), labels = levels(xG_cleaned$event_team))
+
+testQuery2 <- xG_cleaned %>%
+  group_by(event_team = defending_team, season) %>%
+  summarise(xG_against = sum(prob))
+
+write.csv(xG_cleaned, "/Users/liammcfall/HockeyExperimentation/xG_cleaned.csv")
+
+xG_cleaned <- read.csv("/Users/liammcfall/HockeyExperimentation/xG_cleaned.csv")
+
+xG_agg1 <- xG_cleaned %>%
+  group_by(event_team, season) %>%
+  summarise(xG_for = sum(prob))
+
+xG_agg2 <- xG_cleaned %>%
+  group_by(event_team = defending_team, season) %>%
+  summarise(xG_against = sum(prob))
+
+xG_agg <- xG_agg1 %>%
+  left_join(xG_agg2, by = c("event_team", "season"))
+
+xG_agg <- xG_agg %>%
+  mutate(xG_diff = (xG_for - xG_against))
+
+write.csv(xG_agg, "/Users/liammcfall/HockeyExperimentation/xG_agg.csv")
+
+
